@@ -39,6 +39,8 @@ AMoriCharacter::AMoriCharacter()
 	ArmMesh->bLightAttachmentsAsGroup = true;
 	ArmMesh->SetOnlyOwnerSee(true);
 
+	GetCharacterMovement()->MaxWalkSpeed = 360.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 170.f;
 	GetCharacterMovement()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
 
@@ -50,6 +52,8 @@ void AMoriCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AMoriCharacter::MoveRight);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AMoriCharacter::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AMoriCharacter::Turn);
+
+	PlayerInputComponent->BindAction(TEXT("TogglePerspective"), IE_Pressed, this, &AMoriCharacter::TogglePerspective);
 
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AMoriCharacter::Jumping);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AMoriCharacter::StopJumping);
@@ -75,6 +79,17 @@ void AMoriCharacter::LookUp(float AxisValue)
 void AMoriCharacter::Turn(float AxisValue)
 {
 	AddControllerYawInput(AxisValue);
+}
+
+void AMoriCharacter::TogglePerspective()
+{
+	bUseFirstPersonView = !bUseFirstPersonView;
+	
+	GetMesh()->SetOwnerNoSee(bUseFirstPersonView);
+	ArmMesh->SetVisibility(bUseFirstPersonView);
+	
+	SpringArm->TargetArmLength = bUseFirstPersonView ? 0.f : 200.f;
+	SpringArm->SetRelativeLocation(FVector(20.f, (bUseFirstPersonView ? 0.f : 35.f), 70.f));
 }
 
 void AMoriCharacter::Jumping()

@@ -21,9 +21,10 @@ private:
 	void LookUp(float AxisValue);
 	void Turn(float AxisValue);
 
+	void TogglePerspective();
 	void Jumping();
 	void Crouching();
-
+	
 private:
 	UPROPERTY(VisibleAnywhere)
 	class USpringArmComponent* SpringArm;
@@ -33,4 +34,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	class USkeletalMeshComponent* ArmMesh;
+
+	bool bUseFirstPersonView = true;
 };
