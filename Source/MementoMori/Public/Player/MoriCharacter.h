@@ -24,6 +24,11 @@ private:
 	void TogglePerspective();
 	void Jumping();
 	void Crouching();
+	void Running();
+	void CheckRunning(bool bHaveToRun);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRunning(bool bHaveToRun);
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -35,5 +40,10 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	class USkeletalMeshComponent* ArmMesh;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
+
 	bool bUseFirstPersonView = true;
+	bool bCrouching = false;
+	bool bRunning = false;
 };

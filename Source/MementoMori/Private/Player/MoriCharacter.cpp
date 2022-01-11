@@ -4,6 +4,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 AMoriCharacter::AMoriCharacter()
 	: SpringArm(CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm")))
@@ -59,6 +61,9 @@ void AMoriCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AMoriCharacter::StopJumping);
 
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &AMoriCharacter::Crouching);
+
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &AMoriCharacter::Running);
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &AMoriCharacter::Running);
 }
 
 void AMoriCharacter::MoveForward(float AxisValue)
@@ -101,6 +106,41 @@ void AMoriCharacter::Crouching()
 {
 	if (!GetCharacterMovement()->IsFalling())
 	{
-		bIsCrouched ? UnCrouch() : Crouch();
+		bCrouching = !bCrouching;
+		bCrouching ? Crouch() : UnCrouch();
+
+		if (bRunning)
+			CheckRunning(!bCrouching);
 	}
+}
+
+void AMoriCharacter::Running()
+{
+	bRunning = !bRunning;
+
+	if (bRunning && bCrouching)
+	{
+		bCrouching = false;
+		UnCrouch();
+	}
+
+	CheckRunning(bRunning);
+}
+
+void AMoriCharacter::CheckRunning(bool bHaveToRun)
+{
+	GetCharacterMovement()->MaxWalkSpeed = bHaveToRun ? 540.f : 360.f;
+
+	if (UGameplayStatics::GetPlayerCameraManager(this, 0) && CameraShakeClass)
+	{
+		auto* CameraManager = UGameplayStatics::GetPlayerCameraManager(this, 0);
+		bHaveToRun ? CameraManager->StartCameraShake(CameraShakeClass) : CameraManager->StopAllCameraShakes();
+	}
+
+	ServerRunning(bHaveToRun);
+}
+
+void AMoriCharacter::ServerRunning_Implementation(bool bHaveToRun)
+{
+	GetCharacterMovement()->MaxWalkSpeed = bHaveToRun ? 540.f : 360.f;
 }
