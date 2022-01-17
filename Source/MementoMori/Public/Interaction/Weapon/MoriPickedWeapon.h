@@ -2,15 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "MoriWeapon.generated.h"
+#include "MoriPickedWeapon.generated.h"
 
 UCLASS()
-class MEMENTOMORI_API AMoriWeapon : public AActor
+class MEMENTOMORI_API AMoriPickedWeapon : public AActor
 {
 	GENERATED_BODY()
 	
 public:
-	AMoriWeapon();
+	AMoriPickedWeapon();
 
 private:
 	UPROPERTY()

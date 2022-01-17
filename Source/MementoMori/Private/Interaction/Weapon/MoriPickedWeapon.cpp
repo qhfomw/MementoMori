@@ -1,9 +1,9 @@
-#include "Weapon/MoriWeapon.h"
+#include "Interaction/Weapon/MoriPickedWeapon.h"
 
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
-AMoriWeapon::AMoriWeapon()
+AMoriPickedWeapon::AMoriPickedWeapon()
 	: Socket(CreateDefaultSubobject<USceneComponent>(TEXT("Socket")))
 	, Mesh(CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh")))
 	, ArmMesh(CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("ArmMesh")))
@@ -14,7 +14,7 @@ AMoriWeapon::AMoriWeapon()
 
 	Mesh->SetupAttachment(RootComponent);
 	Mesh->CanCharacterStepUpOn = ECB_No;
-	Mesh->SetCollisionProfileName(TEXT("Weapon"));
+	Mesh->SetCollisionProfileName(TEXT("PickedWeapon"));
 	Mesh->CastShadow = false;
 	Mesh->SetIsReplicated(true);
 	
