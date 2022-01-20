@@ -14,21 +14,31 @@ class MEMENTOMORI_API AMoriDroppedWeapon : public AActor, public IMoriInteractio
 public:
 	AMoriDroppedWeapon();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastInit(TSubclassOf<class AMoriPickedWeapon> InWeaponClass, float InAmmoNum, class USkeletalMesh* InMesh);
+	UFUNCTION(Server, Reliable)
+	void ServerInit(class USkeletalMesh* InMesh, TSubclassOf<class AMoriPickedWeapon> InWeaponClass, int32 InAmmoNum);
 
-	virtual void Interact(class AMoriCharacter* Interactor) override;
+	virtual void Interact(ACharacter* Interactor) override;
 
+	virtual bool TryToInteract() { return bTryToInteract; }
 	virtual float GetInteractionTime() const { return InteractionTime; }
 	virtual const FString& GetDescription() const { return Description; }
 	virtual const class UTexture2D* GetIcon() const { return Icon; }
 
-private:
-	void CheckPhysics();
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(Replicated, VisibleInstanceOnly)
 	class USkeletalMeshComponent* Mesh;
+
+	UPROPERTY(Replicated, EditInstanceOnly)
+	TSubclassOf<class AMoriPickedWeapon> WeaponClass;
+
+	UPROPERTY(Replicated, EditInstanceOnly)
+	int32 AmmoNum;
+
+	UPROPERTY(EditInstanceOnly)
+	bool bTryToInteract = true;
 
 	UPROPERTY(EditInstanceOnly)
 	float InteractionTime;
@@ -38,12 +48,4 @@ private:
 
 	UPROPERTY(EditInstanceOnly)
 	class UTexture2D* Icon;
-
-	UPROPERTY(EditInstanceOnly)
-	TSubclassOf<class AMoriPickedWeapon> WeaponClass;
-
-	UPROPERTY(EditInstanceOnly)
-	float AmmoNum;
-
-	FTimerHandle PhysicsTimerHandle;
 };

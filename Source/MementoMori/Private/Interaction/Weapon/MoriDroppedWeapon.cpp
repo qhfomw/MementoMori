@@ -1,5 +1,6 @@
 #include "Interaction/Weapon/MoriDroppedWeapon.h"
 #include "Interaction/Weapon/MoriPickedWeapon.h"
+#include "Player/MoriActionInterface.h"
 #include "Player/MoriCharacter.h"
 
 #include "Components/SkeletalMeshComponent.h"
@@ -18,33 +19,27 @@ AMoriDroppedWeapon::AMoriDroppedWeapon()
 	Mesh->SetSimulatePhysics(true);
 }
 
-void AMoriDroppedWeapon::MulticastInit_Implementation(TSubclassOf<AMoriPickedWeapon> InWeaponClass, float InAmmoNum, USkeletalMesh* InMesh)
+void AMoriDroppedWeapon::ServerInit_Implementation(USkeletalMesh* InMesh, TSubclassOf<AMoriPickedWeapon> InWeaponClass, int32 InAmmoNum)
 {
+	Mesh->SetSkeletalMesh(InMesh, true);
 	WeaponClass = InWeaponClass;
 	AmmoNum = InAmmoNum;
-	Mesh->SetSkeletalMesh(InMesh, true);
-
-	if (HasAuthority() && GetWorld())
-		GetWorld()->GetTimerManager().SetTimer(PhysicsTimerHandle, this, &AMoriDroppedWeapon::CheckPhysics, 1.f, true);
 }
 
-void AMoriDroppedWeapon::Interact(AMoriCharacter* Interactor)
+void AMoriDroppedWeapon::Interact(ACharacter* Interactor)
 {
-	if (Interactor)
-		Interactor->PickupWeapon(WeaponClass, AmmoNum);
+	if (auto* Picker = Cast<IMoriActionInterface>(Interactor))
+		Picker->PickupWeapon(WeaponClass, AmmoNum);
 
 	if (auto* World = GetWorld())
 		World->DestroyActor(this);
 }
 
-void AMoriDroppedWeapon::CheckPhysics()
+void AMoriDroppedWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const
 {
-	if (Mesh->GetComponentVelocity() == FVector(0.f))
-	{
-		Mesh->SetSimulatePhysics(false);
-		PhysicsTimerHandle.Invalidate();
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-		if (HasAuthority())
-			SetReplicateMovement(false);
-	}
+	DOREPLIFETIME(AMoriDroppedWeapon, Mesh);
+	DOREPLIFETIME(AMoriDroppedWeapon, WeaponClass);
+	DOREPLIFETIME(AMoriDroppedWeapon, AmmoNum);
 }
