@@ -15,13 +15,13 @@ class MEMENTOMORI_API IMoriInteractionInterface
 	GENERATED_BODY()
 
 public:
-	virtual void Interact(class AMoriCharacter* Interactor) {}
+	virtual void Interact(ACharacter* Interactor) {}
 
-	virtual void BeginHover(class AMoriCharacter* Interactor) {}
+	virtual void BeginHover(ACharacter* Interactor) {}
 	virtual void EndHover() {}
 
-	virtual void BeginInteract(class AMoriCharacter* Interactor) {}
-	virtual void EndInteract() {}
+	virtual void BeginInteracting(ACharacter* Interactor) {}
+	virtual void EndInteracting() {}
 
 	virtual bool TryToInteract() { return false; }
 	virtual float GetInteractionTime() const { return 0.f; }
