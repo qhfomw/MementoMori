@@ -4,6 +4,15 @@
 #include "GameFramework/Actor.h"
 #include "MoriPickedWeapon.generated.h"
 
+UENUM(BlueprintType)
+enum class EMoriWeaponType : uint8
+{
+	Primary,
+	Secondary,
+	Melee,
+	None
+};
+
 UCLASS()
 class MEMENTOMORI_API AMoriPickedWeapon : public AActor
 {
@@ -11,6 +20,8 @@ class MEMENTOMORI_API AMoriPickedWeapon : public AActor
 	
 public:
 	AMoriPickedWeapon();
+
+	EMoriWeaponType GetWeaponType() const { return WeaponType; }
 
 private:
 	UPROPERTY()
@@ -21,4 +32,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	class USkeletalMeshComponent* ArmMesh;
+
+	UPROPERTY(EditDefaultsOnly)
+	EMoriWeaponType WeaponType = EMoriWeaponType::None;
 };
